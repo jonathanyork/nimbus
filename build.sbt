@@ -34,3 +34,20 @@ resolvers += "Sonatype OSS Snapshots" at
 testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
 
 parallelExecution in Test := false
+
+lazy val scalatest = "org.scalatest" %% "scalatest" % "3.0.1"
+
+lazy val Bench = config("bench") extend(Test)
+
+def benchFilter(name: String): Boolean = name endsWith "Bench"
+def specFilter(name: String): Boolean = name endsWith "Spec"
+
+lazy val root = (project in file("."))
+  .configs(Bench)
+  .settings(
+    scalaVersion := "2.11.8",
+    inConfig(Bench)(Defaults.testTasks),
+    testOptions in Test := Seq(Tests.Filter(specFilter)),
+    testOptions in Bench := Seq(Tests.Filter(benchFilter))
+  )
+  
